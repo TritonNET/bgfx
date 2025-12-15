@@ -2929,7 +2929,9 @@ namespace bgfx
 
 } // namespace bgfx
 
-//int main(int _argc, const char* _argv[])
-//{
-//	return bgfx::compileShader(_argc, _argv);
-//}
+#ifndef TRITONSIM_SHADER_PACKER
+int main(int _argc, const char* _argv[])
+{
+	return bgfx::compileShader(_argc, _argv);
+}
+#endif // !TRITONSIM_SHADER_PACKER
