@@ -447,7 +447,6 @@ protected:
 	virtual std::string builtin_to_glsl(BuiltIn builtin, StorageClass storage);
 	virtual void emit_struct_member(const SPIRType &type, uint32_t member_type_id, uint32_t index,
 	                                const std::string &qualifier = "", uint32_t base_offset = 0);
-	virtual void emit_struct_padding_target(const SPIRType &type);
 	virtual std::string image_type_glsl(const SPIRType &type, uint32_t id = 0, bool member = false);
 	std::string constant_expression(const SPIRConstant &c,
 	                                bool inside_block_like_struct_scope = false,
@@ -763,6 +762,7 @@ protected:
 	bool expression_read_implies_multiple_reads(uint32_t id) const;
 	SPIRExpression &emit_op(uint32_t result_type, uint32_t result_id, const std::string &rhs, bool forward_rhs,
 	                        bool suppress_usage_tracking = false);
+	void emit_transposed_op(uint32_t result_type, uint32_t result_id, const std::string &rhs, bool forward_rhs);
 
 	void access_chain_internal_append_index(std::string &expr, uint32_t base, const SPIRType *type,
 	                                        AccessChainFlags flags, bool &access_chain_is_arrayed, uint32_t index);
@@ -772,7 +772,7 @@ protected:
 
 	// Only meaningful on backends with physical pointer support ala MSL.
 	// Relevant for PtrAccessChain / BDA.
-	virtual uint32_t get_physical_type_stride(const SPIRType &type) const;
+	virtual uint32_t get_physical_type_id_stride(TypeID type_id) const;
 
 	StorageClass get_expression_effective_storage_class(uint32_t ptr);
 	virtual bool access_chain_needs_stage_io_builtin_translation(uint32_t base);
@@ -805,6 +805,7 @@ protected:
 	const char *index_to_swizzle(uint32_t index);
 	std::string remap_swizzle(const SPIRType &result_type, uint32_t input_components, const std::string &expr);
 	std::string declare_temporary(uint32_t type, uint32_t id);
+	bool can_declare_inline_temporary(uint32_t id) const;
 	void emit_uninitialized_temporary(uint32_t type, uint32_t id);
 	SPIRExpression &emit_uninitialized_temporary_expression(uint32_t type, uint32_t id);
 	virtual void append_global_func_args(const SPIRFunction &func, uint32_t index, SmallVector<std::string> &arglist);
